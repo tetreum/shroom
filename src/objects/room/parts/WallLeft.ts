@@ -77,10 +77,20 @@ export class WallLeft extends PIXI.Container implements IRoomPart {
     const hitArea = new PIXI.Polygon(this._getDisplayPoints());
 
     this.hitArea = hitArea;
+    let primary;
+    let border;
+    let top;
 
-    const primary = this._createPrimarySprite();
-    const border = this._createBorderSprite();
-    const top = this._createTopSprite();
+    if (true) {
+      primary = this._createPrimarySprite();
+      border = this._createBorderSprite();
+      top = this._createTopSprite();
+    } else {
+      primary = this._createPrimarySpriteOld();
+      border = this._createBorderSpriteOld();
+      top = this._createTopSpriteOld();
+    }
+    
 
     this.addChild(primary);
 
@@ -144,6 +154,54 @@ export class WallLeft extends PIXI.Container implements IRoomPart {
   }
 
   private _createPrimarySprite() {
+    const border = new PIXI.Graphics();
+
+    // Draw the border shape
+    border.beginTextureFill({
+      texture: this._wallTexture ?? PIXI.Texture.WHITE,
+      color: this._wallLeftColor,
+    });
+    border.drawRect(0, 0, this._wallWidth, this.wallHeight);
+    border.endFill();
+    
+    border.transform.setFromMatrix(new PIXI.Matrix(-1, 0.5, 0, 1));
+    border.x = this._getOffsetX() + this._borderWidth + this._wallWidth;
+    border.y = this.wallY;
+
+    return border;
+  }
+
+  private _createBorderSprite() {
+    const border = new PIXI.Graphics();
+
+    // Draw the border shape
+    border.beginFill(this._wallRightColor);
+    border.drawRect(0, 0, this._borderWidth, this._wallHeight + this._tileHeight);
+    border.endFill();
+    
+    border.transform.setFromMatrix(new PIXI.Matrix(-1, -0.5, 0, 1));
+    border.y = this.wallY + this._wallWidth / 2;
+    border.x = this._getOffsetX() + this._borderWidth;
+
+    return border;
+  }
+
+  private _createTopSprite() {
+    const border = new PIXI.Graphics();
+
+    // Draw the border shape
+    border.beginFill(this._wallTopColor);
+    border.drawRect(0, 0, this._borderWidth, this._wallWidth);
+    border.endFill();
+
+    border.transform.setFromMatrix(new PIXI.Matrix(1, 0.5, 1, -0.5));
+    border.x = this._getOffsetX() + 0;
+    border.y = this.wallY + this._wallWidth / 2 - this._borderWidth / 2;
+
+    return border;
+  }
+
+  private _createPrimarySpriteOld() {
     const sprite = new PIXI.TilingSprite(
       this._wallTexture ?? PIXI.Texture.WHITE,
       this._wallWidth,
@@ -157,7 +215,7 @@ export class WallLeft extends PIXI.Container implements IRoomPart {
     return sprite;
   }
 
-  private _createBorderSprite() {
+  private _createBorderSpriteOld() {
     const border = new PIXI.TilingSprite(
       PIXI.Texture.WHITE,
       this._borderWidth,
@@ -172,7 +230,7 @@ export class WallLeft extends PIXI.Container implements IRoomPart {
     return border;
   }
 
-  private _createTopSprite() {
+  private _createTopSpriteOld() {
     const border = new PIXI.TilingSprite(
       PIXI.Texture.WHITE,
       this._borderWidth,

@@ -16,6 +16,7 @@ export class RoomCamera extends PIXI.Container {
 
   private _tween: any;
   private _target: EventTarget;
+  private isMobile: boolean = false;
 
   constructor(
     private readonly _room: Room,
@@ -26,6 +27,7 @@ export class RoomCamera extends PIXI.Container {
 
     const target = this._options?.target ?? window;
     this._target = target;
+    this.isMobile = screen.width < 400;
 
     this._parentContainer = new PIXI.Container();
     this._parentContainer.hitArea = this._parentBounds();
@@ -271,7 +273,7 @@ export class RoomCamera extends PIXI.Container {
     position: PIXI.Point,
     pointerId: number
   ) {
-    if (state.pointerId !== pointerId) return;
+    if (state.pointerId !== pointerId && !this.isMobile) return;
 
     const distance = Math.sqrt(
       (position.x - state.startX) ** 2 + (position.y - state.startY) ** 2

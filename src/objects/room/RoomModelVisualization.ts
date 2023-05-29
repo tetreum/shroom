@@ -50,6 +50,9 @@ export class RoomModelVisualization
   private _wallHitAreaLayer: PIXI.Container = new PIXI.Container();
   private _masksLayer: PIXI.Container = new PIXI.Container();
 
+  private tileCursor: PIXI.Graphics = new PIXI.Graphics();
+  private testMode: boolean = true;
+
   private _wallTexture: PIXI.Texture | undefined;
   private _floorTexture: PIXI.Texture | undefined;
 
@@ -129,6 +132,10 @@ export class RoomModelVisualization
     new EventManagerContainer(this._application, this._eventManager);
 
     this._updateHeightmap();
+
+    if (this.testMode) {
+      this.createCursor();  
+    }
 
     this._application.ticker.add(this._handleTick);
   }
@@ -395,7 +402,8 @@ export class RoomModelVisualization
     };
   }
 
-  private _setCache(cache: boolean) {
+  public _setCache(cache: boolean) {
+    return;
     [this._tileLayer, this._wallLayer].forEach(
       (container) => (container.cacheAsBitmap = cache)
     );
@@ -557,6 +565,21 @@ export class RoomModelVisualization
     const showBorders = this.shouldShowBorders(x, y);
 
     const tile = new Tile({ color: "#eeeeee", tileHeight: this._tileHeight, showBorders });
+    
+    if (this.testMode) {
+      tile.interactive = true;
+      tile.on('pointerover', () => {
+        const { x: posX, y: posY } = this._getPosition(x, y, z);
+
+        this.tileCursor.visible = true;
+        this.tileCursor.x = posX;
+        this.tileCursor.y = posY;
+        this.tileCursor.zIndex = getZOrder(x, y, z) - 1000;
+      });
+      tile.on('pointerout', () => {
+        this.tileCursor.visible = false;
+      });
+    }
 
     const xEven = x % 2 === 0;
     const yEven = y % 2 === 0;
@@ -571,7 +594,54 @@ export class RoomModelVisualization
     (container ?? this._tileLayer).addChild(tile);
     this._tiles.push(tile);
 
-    this._createTileCursor(x, y, z, container);
+    if (!this.testMode) {
+      this._createTileCursor(x, y, z, container);
+    }
+  }
+
+  private createCursor () {
+    // @ts-ignore
+    this.points = {
+      p1: { x: 0, y: 16 },
+      p2: { x: 32, y: 0 },
+      p3: { x: 64, y: 16 },
+      p4: { x: 32, y: 32 },
+    };
+    this.tileCursor.visible = false;
+    this.drawBorder(this.tileCursor, 0x000000, 0.33, 0);
+    this.drawBorder(this.tileCursor, 0xa7d1e0, 1, -2);
+    this.drawBorder(this.tileCursor, 0xffffff, 1, -3);
+
+    this._primaryLayer.addChild(this.tileCursor);
+  }
+
+   drawBorder(
+    graphics: PIXI.Graphics,
+    color: number,
+    alpha = 1,
+    offsetY: number
+  ) {
+    graphics.beginFill(color, alpha);
+    // @ts-ignore
+    graphics.moveTo(this.points.p1.x, this.points.p1.y + offsetY);
+    // @ts-ignore
+    graphics.lineTo(this.points.p2.x, this.points.p2.y + offsetY);
+    // @ts-ignore
+    graphics.lineTo(this.points.p3.x, this.points.p3.y + offsetY);
+    // @ts-ignore
+    graphics.lineTo(this.points.p4.x, this.points.p4.y + offsetY);
+    graphics.endFill();
+  
+    graphics.beginHole();
+    // @ts-ignore
+    graphics.moveTo(this.points.p1.x + 6, this.points.p1.y + offsetY);
+    // @ts-ignore
+    graphics.lineTo(this.points.p2.x, this.points.p2.y + 3 + offsetY);
+    // @ts-ignore
+    graphics.lineTo(this.points.p3.x - 6, this.points.p3.y + offsetY);
+    // @ts-ignore
+    graphics.lineTo(this.points.p4.x, this.points.p4.y - 3 + offsetY);
+    graphics.endHole();
   }
 
   private _createTileCursor(
