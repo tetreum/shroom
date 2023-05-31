@@ -93,6 +93,8 @@ export class FurnitureData implements IFurnitureData {
         const id = element.$.id;
 
         typeToInfo[type] = formatFurnitureData(element);
+        // @ts-ignore
+        typeToInfo[type].placementType = furnitureType;
 
         if (furnitureType === "floor") {
           if (floorIdToType[id] != null)
@@ -108,8 +110,8 @@ export class FurnitureData implements IFurnitureData {
       });
     };
 
-    register(parsed.furnidata.roomitemtypes[0].furnitype, "wall");
-    register(parsed.furnidata.wallitemtypes[0].furnitype, "floor");
+    register(parsed.furnidata.roomitemtypes[0].furnitype, "floor");
+    register(parsed.furnidata.wallitemtypes[0].furnitype, "wall");
 
     return { typeToInfo, floorIdToType, wallIdToType };
   }
