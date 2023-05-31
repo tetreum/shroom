@@ -29,6 +29,7 @@ import {
 import { NOOP_EVENT_MANAGER } from "../events/EventManager";
 import { FurnitureVisualizationView } from "./FurnitureVisualizationView";
 import { EventOverOutHandler } from "../events/EventOverOutHandler";
+import { StaticFurnitureVisualization } from "./visualization/BasicFurnitureVisualization";
 
 const highlightFilter = new HighlightFilter(0x999999, 0xffffff);
 
@@ -523,6 +524,13 @@ export class BaseFurniture implements IFurnitureEventHandlers, IEventGroup {
 
       this._loadFurniResult = result;
       this._resolveLoadFurniResult && this._resolveLoadFurniResult(result);
+
+      switch (result.getExtraData().visualization) {
+        case "furniture_static":
+          this._visualization = new StaticFurnitureVisualization();
+          break;
+      }
+
       this._updateFurniture();
 
       this._onLoad && this._onLoad();
