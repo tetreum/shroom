@@ -27,7 +27,7 @@ export class RoomCamera extends PIXI.Container {
 
     const target = this._options?.target ?? window;
     this._target = target;
-    this.isMobile = screen.width < 400;
+    this.isMobile = screen.width < 600;
 
     this._parentContainer = new PIXI.Container();
     this._parentContainer.hitArea = this._parentBounds();

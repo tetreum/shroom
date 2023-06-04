@@ -62,7 +62,7 @@ export class JsonFurnitureAssetBundle implements IFurnitureAssetBundle {
     const spritesheet = new PIXI.Spritesheet(baseTexture, json.spritesheet);
 
     await new Promise<void>((resolve) => {
-      spritesheet.parse(() => {
+      spritesheet.parse().then(() => {
         resolve();
       });
     });
