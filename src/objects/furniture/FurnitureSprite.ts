@@ -77,7 +77,5 @@ export class FurnitureSprite extends HitSprite {
     this.x = this.baseX + this.offsetX;
     this.y = this.baseY + this.offsetY;
     this.zIndex = this.baseZIndex + this.offsetZIndex;
-
-    this.updateHitboxPosition();
   }
 }
